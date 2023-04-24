@@ -12,7 +12,7 @@ print("TEST ")
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # Bind to BeamNG OutGauge.
-sock.bind(('192.168.2.108', 4444))
+sock.bind(('192.168.2.103', 4444))
 
 while True:
     # Receive data.
