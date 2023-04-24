@@ -1,5 +1,4 @@
 import can
-import paho.mqtt.client as mqtt
 import os
 import time
 
@@ -17,6 +16,25 @@ time.sleep(0.1)
 #Can-Message angekommen
 def on_message_received(msg):
     print("msg erhalten: \n", str(msg))
+    
+    if (msg.arbitration_id == 0x7df):
+        pid = msg.data[2]
+        
+        if (pid == 12):
+            print("OBD Anfrage erhalten RPM",rpm)
+            transferValue = int(rpm * 4)
+            A = int(transferValue/256)
+            B = transferValue%256
+            data2 = [4, 0x41, pid, A, B, 0, 0, 0]
+            msg_back = can.Message(arbitration_id=0x7e8, data=data2, extended_id=False)
+            bus.send(msg_back)
+
+        if (pid == 13):
+            print("OBD Anfrage erhalten V",velocity)
+            A = int(velocity)
+            data2 = [4, 0x41, pid, A, 0, 0, 0, 0]
+            msg_back = can.Message(arbitration_id=0x7e8, data=data2, extended_id=False)
+            bus.send(msg_back)
 
 bus = can.ThreadSafeBus(channel='can0', bustype='socketcan_native')
 msg = can.Message(arbitration_id=0x050, data=[1], extended_id=False)
