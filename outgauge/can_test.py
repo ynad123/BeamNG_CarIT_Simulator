@@ -10,6 +10,7 @@ import os
 velocity = 0
 rpm = 0
 
+
 os.system("sudo /sbin/ip link set can0 up type can bitrate 500000")
 time.sleep(0.1)
 
