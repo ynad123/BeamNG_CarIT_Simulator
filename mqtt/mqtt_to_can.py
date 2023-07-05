@@ -52,10 +52,12 @@ def on_messageHIVE(mosq, obj, msg):
     
             #print(m_decode)
             m_in = json.loads(m_decode)
-            speed = m_in["wheelspeed"]*3.6
+            
+            velocity = m_in["wheelspeed"]*3.6
             rpm = m_in["rpm"]
             temp = m_in["oil_temperature"]
-            print(speed)
+            
+            print(velocity)
             print(rpm)
             print(temp)            
             print("-----")
