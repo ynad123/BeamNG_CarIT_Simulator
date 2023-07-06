@@ -1,6 +1,6 @@
 # Bridge from MQTT to CAN-Bus using in RaspPi
 
-#import can
+import can
 import os
 import time
 
@@ -19,10 +19,10 @@ velocity = 0
 rpm = 0
 temp = 0
 
-topic_str = "ima_beamng1"
+topic_str = "ima_beamng"
 
 
-#os.system("sudo /sbin/ip link set can0 up type can bitrate 500000")
+os.system("sudo /sbin/ip link set can0 up type can bitrate 500000")
 time.sleep(0.1)
 
 
@@ -43,6 +43,7 @@ def on_connectHIVE(mqttClient2, userdata, flags, rc):
     
 #Reseive message and send with latence a response
 def on_messageHIVE(mosq, obj, msg):
+    global temp, rpm, velocity
     try:
         if msg.topic.startswith(topic_str):
             m_decode = str(msg.payload.decode("utf-8","ignore"))
@@ -57,18 +58,22 @@ def on_messageHIVE(mosq, obj, msg):
             rpm = m_in["rpm"]
             temp = m_in["oil_temperature"]
             
-            print(velocity)
-            print(rpm)
-            print(temp)            
-            print("-----")
+            #print(velocity)
+            #print(rpm)
+            #print(temp)            
+            #print("-----")
     except:
         print("Fehler")
 
 
 ########### Can-Message received ########################################################
 def on_message_received(msg):
-    print("msg erhalten: \n", str(msg))
     
+    #print("msg erhalten: \n", str(msg))
+    #print(velocity)
+    #print(rpm)
+    #print(temp)
+    #print("--")
     if (msg.arbitration_id == 0x7df):
         pid = msg.data[2]
         
@@ -96,13 +101,13 @@ def on_message_received(msg):
             msg_back = can.Message(arbitration_id=0x7e8, data=data2, extended_id=False)
             bus.send(msg_back)
 
-#bus = can.ThreadSafeBus(channel='can0', bustype='socketcan_native')
-#msg = can.Message(arbitration_id=0x050, data=[1], extended_id=False)
-#bus.send(msg)
+bus = can.ThreadSafeBus(channel='can0', bustype='socketcan_native')
+msg = can.Message(arbitration_id=0x050, data=[1], extended_id=False)
+bus.send(msg)
 
-#listener = can.Listener()
-#listener.on_message_received = on_message_received
-#notifier = can.Notifier(bus, [listener])
+listener = can.Listener()
+listener.on_message_received = on_message_received
+notifier = can.Notifier(bus, [listener])
 
 
 print("START")
@@ -115,6 +120,8 @@ process_connect2ServerHIVE()
 
 while True:
     time.sleep(2)
+    print (temp, " ", rpm, " ", velocity)
+    
 
 
 
